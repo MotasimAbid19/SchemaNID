@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local environments and editors
+.venv/
+venv/
+.env
+.idea/
+.vscode/
+
+# Local data and generated outputs
+data/
+outputs/
+work/
+
+# Generated notebooks and temporary files
+.ipynb_checkpoints/
+tmp/
+*.tmp
+
+# Large experiment artifacts are distributed separately
+*.pt
+*.pth
+*.ckpt
+*.npz
+*.parquet
+*.zip
+
+# Operating-system files
+.DS_Store
+Thumbs.db

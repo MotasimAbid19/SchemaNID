@@ -1,0 +1,5 @@
+model,macro_f1,balanced_accuracy,mcc
+SchemaNID,0.3824,0.5044,0.0022
+Concept Random Forest,0.3520,0.5123,0.0454
+Concept XGBoost,0.3506,0.5169,0.0507
+TransTab-style,0.3287,0.4710,-0.0659

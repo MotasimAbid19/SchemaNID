@@ -1,0 +1,5 @@
+variant,macro_f1,balanced_accuracy,mcc
+Full SchemaNID,0.3824,0.5044,0.0022
+Without feature-name vectors,0.4066,0.5442,0.1022
+Without presence/type metadata,0.3997,0.5291,0.0620
+Without concept embeddings,0.3731,0.4801,-0.0468

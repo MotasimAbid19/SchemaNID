@@ -1,0 +1,6 @@
+model,cic_ids2017_mean,cic_ids2017_sd,cse_cic_ids2018_mean,cse_cic_ids2018_sd,cicddos2019_mean,cicddos2019_sd,unsw_nb15_mean,unsw_nb15_sd,overall_mean,rank
+Concept XGBoost,0.9941,0.0001,0.9786,0.0002,0.9977,0.0001,0.9418,0.0007,0.9780,1
+SchemaNID,0.9940,0.0001,0.9770,0.0005,0.9970,0.0002,0.9400,0.0003,0.9770,2
+Concept Random Forest,0.9939,0.0001,0.9769,0.0006,0.9969,0.0000,0.9384,0.0003,0.9765,3
+Adapted FlowTransformer,0.9921,0.0014,0.9788,0.0004,0.9956,0.0002,0.9289,0.0003,0.9738,4
+TreeHive-inspired,0.9914,0.0019,0.9637,0.0053,0.9970,0.0004,0.8949,0.0033,0.9618,5

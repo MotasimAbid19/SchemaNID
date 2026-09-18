@@ -1,0 +1,40 @@
+cff-version: 1.2.0
+message: "If you use SchemaNID, please cite the associated paper and this software repository."
+title: "SchemaNID: A Schema-Aware Attention Architecture for Network Intrusion Detection"
+type: software
+license: MIT
+authors:
+  - given-names: Motasim
+    family-names: Abid
+    email: motasim.abid@northsouth.edu
+    affiliation: North South University
+  - given-names: Mahmudul
+    family-names: Hasan
+    email: mahmudul.hasan.241@northsouth.edu
+    affiliation: North South University
+  - given-names: Muhammad Shafayat
+    family-names: Oshman
+    email: muhammad.oshman@northsouth.edu
+    affiliation: North South University
+abstract: >-
+  Code and reported results for SchemaNID, a schema-aware attention
+  architecture for flow-based network intrusion detection across heterogeneous
+  feature schemas.
+version: "0.1.0"
+keywords:
+  - network intrusion detection
+  - cross-domain evaluation
+  - heterogeneous schemas
+  - attention
+  - reproducible research
+preferred-citation:
+  type: article
+  title: "SchemaNID: A Schema-Aware Attention Architecture for Network Intrusion Detection"
+  authors:
+    - given-names: Motasim
+      family-names: Abid
+    - given-names: Mahmudul
+      family-names: Hasan
+    - given-names: Muhammad Shafayat
+      family-names: Oshman
+  year: 2026
