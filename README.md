@@ -248,10 +248,9 @@ SchemaNID/
 
 - The task is binary detection; attack families are not predicted separately.
 - The study uses four public datasets and three random seeds.
-- The rule-based concepts are deliberately simple.
 - The name fingerprint represents stable identity, not linguistic meaning.
 - FlowTransformer, TreeHive, and TransTab are adapted, inspired, or style
-  comparators rather than exact reproductions of every original setting.
+  comparators settings.
 - Threshold policies differ between some comparators, so comparisons are
   reported descriptively.
 
