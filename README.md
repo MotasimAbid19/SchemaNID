@@ -9,10 +9,12 @@ and deterministic name identity. Self-attention models interactions among the
 available features, and masked mean pooling creates one representation for the
 network flow.
 
-This is the companion repository for the paper. It provides readable code for
-the architecture, preprocessing, training, evaluation, and ablations, together
-with the final result tables reported in the manuscript. The datasets are not
-redistributed here.
+This is the companion repository for the paper. It contains the model,
+preprocessing, training loop, evaluation metrics, and ablation switches, plus
+the final result tables from the manuscript. The datasets are not included.
+It does not contain the baseline models, the Integrated Gradients analysis, or
+the full experiment scripts, so the reported numbers cannot be regenerated from
+this repository alone.
 
 ## Architecture
 
@@ -31,12 +33,12 @@ between the feature tokens. The feature-presence mask removes unavailable
 positions from both self-attention and mean pooling. Layer normalization and a
 small GELU classification head then produce the binary benign/malicious logit.
 
-The central implementation is intentionally separated into four short files:
+The code is in four files:
 
-- [`schemanid/model.py`](schemanid/model.py) — architecture and paper ablations;
-- [`schemanid/preprocessing.py`](schemanid/preprocessing.py) — fixed value and schema transformations;
-- [`schemanid/training.py`](schemanid/training.py) — weighted training, early stopping, and validation-only threshold selection;
-- [`schemanid/evaluation.py`](schemanid/evaluation.py) — prediction and evaluation metrics.
+- [`schemanid/model.py`](schemanid/model.py): the architecture and the ablation switches.
+- [`schemanid/preprocessing.py`](schemanid/preprocessing.py): fixed value and schema transformations.
+- [`schemanid/training.py`](schemanid/training.py): weighted sampling, early stopping, and threshold selection on validation data only.
+- [`schemanid/evaluation.py`](schemanid/evaluation.py): prediction and metrics.
 
 ## Quick start
 
@@ -68,6 +70,8 @@ python example.py
 `example.py` builds two heterogeneous schemas and performs a forward pass. It
 is an architecture check, not a trained intrusion detector.
 
+To run the smoke tests, install `pytest` and run `python -m pytest`.
+
 Minimal use in your own code:
 
 ```python
@@ -92,6 +96,25 @@ output = model(
 logits = output["logits"]
 ```
 
+To train, pass `(values, present, labels, schema_ids)` arrays for the training
+and validation sets to `train`. It returns the best model and its threshold:
+
+```python
+from schemanid import TrainingConfig, train
+
+result = train(
+    SchemaNID(registry),
+    (train_values, train_present, train_labels, train_schema_ids),
+    (val_values, val_present, val_labels, val_schema_ids),
+    TrainingConfig(seed=101),
+)
+model, threshold = result["model"], result["threshold"]
+```
+
+`labels` is a 0/1 array (see `binary_labels`), and `schema_ids` holds the index
+of each row's schema in the registry. `predict_probabilities` and
+`binary_metrics` in `schemanid/evaluation.py` score a fitted model.
+
 ## Datasets
 
 The paper evaluates four public datasets. Download them from their official
@@ -111,21 +134,41 @@ benign or normal traffic is mapped to `0`.
 
 The public preprocessing code exposes the core operations used by SchemaNID:
 
-- the caller supplies feature names after excluding labels, record identifiers,
-  and other metadata columns;
+- the caller supplies the feature names to keep. Labels and metadata columns
+  must be left out (see the UNSW-NB15 note below);
 - at most 128 flow features are retained;
 - non-finite values become missing values;
 - known protocol strings use fixed numerical codes;
 - finite values use
   `clip(sign(x) * log(1 + min(abs(x), 1e30)) / 20, -1, 1)`;
 - missing values are represented by zero values with a zero presence mask;
-- feature concepts are assigned using fixed name-matching rules;
+- feature concepts are assigned using fixed name-matching rules, applied in the
+  order listed in `CONCEPTS` so that the first matching rule wins;
 - normalized feature names become deterministic 16-bit signed fingerprints.
 
 `deterministic_partitions()` in
-[`schemanid/preprocessing.py`](schemanid/preprocessing.py) shows the seeded
-priority sampling and stratified development split used by the experimental
-protocol.
+[`schemanid/preprocessing.py`](schemanid/preprocessing.py) illustrates the
+seeded priority sampling and the stratified 80/20 development split. In the
+paper's runs, the confirmation records were also chosen to exclude records used
+in earlier model-development experiments. The function does not apply that
+exclusion, so it does not recreate the paper's exact partitions.
+
+**UNSW-NB15 `id` column.** The reported UNSW-NB15 experiments kept the source
+dataset's `id` column, which is why the table above lists 43 features. `id` is a
+row identifier, so a model could use it as a shortcut. The paper states this as
+a limitation, and the Integrated Gradients analysis removed it. To match the
+reported setting, keep `id` in the UNSW-NB15 feature list. To avoid the
+shortcut, drop it, which gives 42 features and results that differ from the
+table.
+
+**Concept rules.** The name-matching rules are simple, and the first match wins.
+As a result, some features fall into broader groups than their names suggest.
+For example, IAT, header, and active/idle features of the CIC datasets match
+forward volume, backward volume, or packet length first. In CIC-IDS2017 and
+CICDDoS2019, `Average Packet Size` matches the TCP flag rule because "ack"
+appears inside "packet". The timing, header, and activity concepts are
+therefore rarely used. These rules are
+part of the reported results and are kept unchanged.
 
 These transformations do not fit target-domain means, variances, quantiles, or
 imputation statistics. In source-only cross-domain evaluation, the target
@@ -165,6 +208,7 @@ random generators.
 | Optimizer | AdamW |
 | Learning rate | 0.0006 |
 | Weight decay | 0.0001 |
+| Gradient-norm clipping | 5.0 |
 | Maximum epochs | 25 |
 | Early-stopping patience | 5 epochs |
 | Loss | Binary cross-entropy from logits |
@@ -239,6 +283,7 @@ SchemaNID/
 │   ├── training.py         # Paper training and selection procedure
 │   └── evaluation.py       # Prediction and metrics
 ├── example.py              # Small architecture example
+├── tests/                  # Smoke tests (python -m pytest)
 ├── requirements.txt
 ├── CITATION.cff
 └── LICENSE
@@ -249,15 +294,18 @@ SchemaNID/
 - The task is binary detection; attack families are not predicted separately.
 - The study uses four public datasets and three random seeds.
 - The name fingerprint represents stable identity, not linguistic meaning.
-- FlowTransformer, TreeHive, and TransTab are adapted, inspired, or style
-  comparators settings.
+- The FlowTransformer, TreeHive, and TransTab results come from adapted,
+  inspired, or style-matched implementations, not exact reproductions of the
+  original methods.
+- The rule-based concepts are deliberately simple.
 - Threshold policies differ between some comparators, so comparisons are
   reported descriptively.
 
 ## Citation
 
-Please cite the associated paper and this repository. Citation metadata is
-provided in [`CITATION.cff`](CITATION.cff).
+Please cite the associated paper (2026 IEEE International Conference on
+Communication, Networks and Satellite, COMNETSAT) and this repository.
+Citation metadata is in [`CITATION.cff`](CITATION.cff).
 
 ## License
 

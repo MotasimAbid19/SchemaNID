@@ -28,8 +28,15 @@ keywords:
   - attention
   - reproducible research
 preferred-citation:
-  type: article
+  type: conference-paper
   title: "SchemaNID: A Schema-Aware Attention Architecture for Network Intrusion Detection"
+  collection-title: "2026 IEEE International Conference on Communication, Networks and Satellite (COMNETSAT)"
+  conference:
+    name: "2026 IEEE International Conference on Communication, Networks and Satellite (COMNETSAT)"
+    city: "Manado"
+    country: "ID"
+    date-start: "2026-12-03"
+    date-end: "2026-12-05"
   authors:
     - given-names: Motasim
       family-names: Abid

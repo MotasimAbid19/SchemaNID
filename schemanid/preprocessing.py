@@ -103,7 +103,7 @@ def concept_id(name: str) -> int:
 
 
 def name_fingerprint(name: str, width: int = 16) -> np.ndarray:
-    """Return the paper's stable signed-bit SHA-256 feature identity."""
+    """Return a fixed vector of +1/-1 values from the SHA-256 of the normalized name."""
 
     normalized = normalize_feature_name(name)
     digest = hashlib.sha256(normalized.encode("utf-8")).digest()
@@ -205,12 +205,15 @@ def deterministic_partitions(
     validation_fraction: float = 0.20,
     validation_seed: int = 2026,
 ) -> dict[str, np.ndarray]:
-    """Reproduce the paper's priority sample and development split.
+    """Illustrate the seeded priority sample and the development split.
 
-    The lowest random priorities form a bounded sample. Confirmation rows are
-    separated before the development rows are stratified into train and
-    validation partitions. Large readers can apply the same priority rule in
-    chunks without keeping every flow record in memory.
+    The lowest random priorities form a bounded sample. The first
+    ``development_rows`` of that sample are stratified into train and
+    validation partitions, and the rest are the confirmation rows.
+
+    This does not recreate the paper's exact partitions. In the paper's runs the
+    confirmation rows were chosen from records not used in earlier
+    model-development experiments, and that exclusion is not applied here.
     """
 
     labels = np.asarray(labels, dtype=np.int64)
